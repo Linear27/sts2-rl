@@ -1,0 +1,19 @@
+#
+# Example local instance config.
+# Replace the placeholder paths with absolute paths on your machine.
+#
+[reference]
+game_root = "C:\\Games\\SlayTheSpire2\\reference"
+clean_baseline_root = "C:\\Games\\SlayTheSpire2\\clean-baseline"
+
+[runtime]
+instances_root = ".\\runtime"
+first_api_port = 8080
+instance_count = 2
+
+[mods]
+enable_sts2_agent = true
+enable_animation_acceleration = true
+
+[logging]
+instance_logs_root = ".\\artifacts\\instance-logs"

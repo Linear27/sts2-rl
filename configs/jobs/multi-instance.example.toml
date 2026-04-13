@@ -1,0 +1,67 @@
+schema_version = 1
+job_name = "multi-instance-smoke"
+description = "Example multi-instance orchestration for collect, eval, replay, compare, and benchmark tasks."
+output_root = "../../artifacts/jobs"
+concurrency_limit = 2
+
+[watchdog]
+health_check_timeout_seconds = 2.0
+failure_degraded_threshold = 1
+failure_cooldown_threshold = 2
+failure_quarantine_threshold = 3
+cooldown_seconds = 15.0
+success_recovery_threshold = 1
+
+[[tasks]]
+task_id = "collect-planner"
+kind = "collect"
+instance_ids = ["inst-01", "inst-02"]
+policy_profile = "planner"
+max_attempts = 2
+normalize_target = "main_menu"
+max_steps_per_instance = 0
+max_runs_per_instance = 1
+max_combats_per_instance = 0
+
+[[tasks]]
+task_id = "eval-planner-policy"
+kind = "eval_policy_pack"
+instance_ids = ["inst-01"]
+policy_profile = "planner"
+max_attempts = 2
+normalize_target = "main_menu"
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+
+[[tasks]]
+task_id = "replay-best-checkpoint"
+kind = "replay"
+instance_ids = ["inst-02"]
+checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-best.json"
+max_attempts = 1
+repeats = 3
+prepare_target = "main_menu"
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+
+[[tasks]]
+task_id = "compare-latest-vs-best"
+kind = "compare"
+instance_ids = ["inst-01"]
+baseline_checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-checkpoint.json"
+candidate_checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-best.json"
+max_attempts = 1
+repeats = 3
+prepare_target = "main_menu"
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+
+[[tasks]]
+task_id = "benchmark-suite"
+kind = "benchmark"
+instance_ids = ["inst-02"]
+benchmark_manifest_path = "../benchmarks/combat-suite.example.toml"
+max_attempts = 1

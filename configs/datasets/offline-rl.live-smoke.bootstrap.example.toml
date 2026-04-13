@@ -1,0 +1,36 @@
+schema_version = 1
+dataset_name = "offline-live-smoke-example-bootstrap"
+dataset_kind = "offline_rl_transitions"
+description = "Bootstrap offline RL transition dataset from inst-02 live smoke session inst02-live-smoke-prepare-r5 with record-level split."
+
+[[sources]]
+path = "../../artifacts/eval-policy/inst02-live-smoke-prepare-r5/combat-eval.jsonl"
+source_kind = "trajectory_log"
+recursive = false
+
+[filters]
+session_kinds = ["eval"]
+session_names = ["inst02-live-smoke-prepare-r5"]
+screen_types = ["COMBAT"]
+decision_sources = ["heuristic"]
+character_ids = ["IRONCLAD"]
+outcomes = ["lost"]
+min_floor = 1
+min_legal_actions = 2
+
+[split]
+train_fraction = 0.8
+validation_fraction = 0.1
+test_fraction = 0.1
+seed = 7
+group_by = "record"
+
+[output]
+export_csv = true
+include_top_level_records = true
+write_split_files = true
+
+[metadata]
+owner = "codex"
+purpose = "offline-cql-bootstrap"
+runtime_instance = "inst-02"

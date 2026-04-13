@@ -1,0 +1,41 @@
+schema_version = 1
+dataset_name = "trajectory-live"
+dataset_kind = "trajectory_steps"
+description = "Trajectory-step dataset built from rollout logs."
+
+[[sources]]
+path = "data/trajectories"
+source_kind = "trajectory_log"
+recursive = true
+
+[filters]
+session_kinds = ["collect", "train", "eval"]
+session_names = []
+instance_ids = []
+character_ids = []
+act_ids = ["THE_CITY"]
+boss_ids = ["THE_CHAMP", "THE_COLLECTOR"]
+second_boss_ids = []
+outcomes = []
+decision_reasons = []
+planner_names = ["boss-conditioned-route-planner-v1"]
+planner_strategies = ["boss_pathing"]
+route_reason_tags = ["search_aoe_tools"]
+route_profiles = []
+min_floor = 1
+
+[split]
+train_fraction = 0.8
+validation_fraction = 0.1
+test_fraction = 0.1
+seed = 7
+group_by = "session_run"
+
+[output]
+export_csv = true
+include_top_level_records = true
+write_split_files = true
+
+[metadata]
+owner = "local"
+purpose = "bc-offline-rl"

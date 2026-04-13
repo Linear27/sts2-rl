@@ -1,0 +1,125 @@
+schema_version = 1
+suite_name = "combat-benchmark"
+description = "Example benchmark suite covering eval, compare, and replay cases."
+base_url = "http://127.0.0.1:8080"
+
+[stats]
+bootstrap_resamples = 1000
+confidence_level = 0.95
+seed = 7
+
+[[cases]]
+case_id = "eval-latest"
+mode = "eval"
+description = "Single-checkpoint repeated evaluation."
+checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-checkpoint.json"
+repeats = 3
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+prepare_target = "main_menu"
+
+[cases.predictor]
+model_path = "../../artifacts/predict/live-v021-bootstrap/combat-outcome-predictor.json"
+mode = "assist"
+hooks = ["map", "reward", "shop", "combat"]
+
+[cases.scenario]
+floor_min = 1
+floor_max = 20
+combat_scope = ["hallway", "elite"]
+tags = ["smoke", "eval"]
+act_ids = ["THE_EXORDIUM", "THE_CITY"]
+boss_ids = ["HEXAGHOST", "THE_CHAMP"]
+planner_strategies = ["boss_pathing"]
+route_reason_tags = ["search_aoe_tools", "prepare_scaling_boss"]
+route_profiles = ["search_aoe_tools", "prepare_scaling_boss"]
+
+[[cases]]
+case_id = "compare-best-vs-latest"
+mode = "compare"
+description = "Paired checkpoint comparison."
+baseline_checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-checkpoint.json"
+candidate_checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-best.json"
+repeats = 3
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+prepare_target = "main_menu"
+
+[cases.scenario]
+floor_min = 1
+floor_max = 30
+combat_scope = ["hallway", "elite", "boss"]
+tags = ["compare"]
+act_ids = ["THE_EXORDIUM", "THE_CITY"]
+boss_ids = ["HEXAGHOST", "THE_CHAMP"]
+planner_strategies = ["boss_pathing"]
+route_reason_tags = ["search_aoe_tools", "prepare_scaling_boss"]
+route_profiles = ["search_aoe_tools", "prepare_scaling_boss"]
+
+[[cases]]
+case_id = "compare-policy-baseline-vs-planner"
+mode = "compare"
+description = "Policy-pack comparison between the baseline heuristics and the combat planner."
+baseline_policy_profile = "baseline"
+candidate_policy_profile = "planner"
+repeats = 3
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+prepare_target = "main_menu"
+
+[cases.baseline_predictor]
+mode = "heuristic_only"
+
+[cases.candidate_predictor]
+model_path = "../../artifacts/predict/live-v021-bootstrap/combat-outcome-predictor.json"
+mode = "dominant"
+hooks = ["combat"]
+
+[cases.shadow]
+source = "../../data/shadow/live-v030"
+
+[cases.promotion]
+min_seed_set_coverage = 1.0
+min_route_decision_count = 1
+min_route_decision_overlap_rate = 0.25
+min_delta_total_reward = 0.0
+min_delta_combat_win_rate = 0.0
+min_delta_route_quality_score = 0.0
+min_delta_pre_boss_readiness = 0.0
+max_delta_route_risk_score = 0.5
+min_shadow_comparable_encounter_count = 8
+min_shadow_candidate_advantage_rate = 0.0
+min_shadow_delta_first_action_match_rate = 0.0
+min_shadow_delta_trace_hit_rate = 0.0
+
+[cases.scenario]
+combat_scope = ["policy", "planner"]
+tags = ["compare", "policy-pack"]
+act_ids = ["THE_CITY"]
+boss_ids = ["THE_CHAMP", "THE_COLLECTOR"]
+planner_strategies = ["legacy", "boss_pathing"]
+route_reason_tags = ["search_aoe_tools", "early_rest_for_survival"]
+route_profiles = ["search_aoe_tools", "early_rest_for_survival"]
+
+[[cases]]
+case_id = "replay-best"
+mode = "replay"
+description = "Replay stability for the promoted checkpoint."
+checkpoint_path = "../../artifacts/training/smoke-dqn/combat-dqn-best.json"
+repeats = 3
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+prepare_target = "main_menu"
+
+[cases.scenario]
+combat_scope = ["stability"]
+tags = ["replay"]
+act_ids = ["THE_BEYOND"]
+boss_ids = ["TIME_EATER", "AWAKENED_ONE"]
+planner_strategies = ["boss_pathing"]
+route_reason_tags = ["prepare_scaling_boss"]
+route_profiles = ["prepare_scaling_boss"]

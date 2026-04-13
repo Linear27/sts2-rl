@@ -1,0 +1,27 @@
+schema_version = 1
+job_name = "policy-pack-smoke-single"
+description = "Single-instance live smoke that normalizes to MAIN_MENU and runs one full policy-pack evaluation."
+output_root = "../../artifacts/jobs"
+concurrency_limit = 1
+
+[watchdog]
+health_check_timeout_seconds = 2.0
+failure_degraded_threshold = 1
+failure_cooldown_threshold = 2
+failure_quarantine_threshold = 3
+cooldown_seconds = 15.0
+success_recovery_threshold = 1
+
+[[tasks]]
+task_id = "eval-policy-pack-single"
+kind = "eval_policy_pack"
+instance_ids = ["inst-01"]
+policy_profile = "baseline"
+max_attempts = 1
+normalize_target = "main_menu"
+normalize_max_steps = 0
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+poll_interval_seconds = 0.25
+max_idle_polls = 40

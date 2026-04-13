@@ -1,0 +1,41 @@
+schema_version = 1
+dataset_name = "offline-live"
+dataset_kind = "offline_rl_transitions"
+description = "Offline RL transition dataset built from trajectory logs."
+
+[[sources]]
+path = "data/trajectories"
+source_kind = "trajectory_log"
+recursive = true
+
+[filters]
+session_kinds = ["collect", "train", "eval"]
+screen_types = ["COMBAT"]
+decision_sources = ["heuristic", "policy"]
+act_ids = ["THE_CITY"]
+boss_ids = ["THE_CHAMP", "THE_COLLECTOR"]
+second_boss_ids = []
+decision_reasons = []
+planner_names = ["boss-conditioned-route-planner-v1"]
+planner_strategies = ["boss_pathing"]
+route_reason_tags = ["search_aoe_tools"]
+route_profiles = []
+outcomes = ["won", "lost"]
+min_floor = 1
+min_legal_actions = 2
+
+[split]
+train_fraction = 0.8
+validation_fraction = 0.1
+test_fraction = 0.1
+seed = 7
+group_by = "session_run"
+
+[output]
+export_csv = true
+include_top_level_records = true
+write_split_files = true
+
+[metadata]
+owner = "local"
+purpose = "offline-cql"

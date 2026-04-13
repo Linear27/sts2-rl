@@ -1,0 +1,71 @@
+schema_version = 1
+dag_name = "predictor-promotion-example"
+description = "Collect trajectories, extract a predictor dataset, train a predictor, score it, register it, and promote the report."
+output_root = "./artifacts/dags"
+lock_root = "./artifacts/orchestration-locks"
+
+[[stages]]
+stage_id = "collect_live"
+kind = "runtime_job"
+description = "Collect combat outcomes from the local single-instance runtime."
+manifest_path = "../jobs/multi-instance.example.toml"
+config_path = "../instances/local.single.example.toml"
+job_name = "predictor-collect"
+output_root = "./artifacts/jobs"
+replace_existing = true
+max_attempts = 2
+resources = ["gpu:0"]
+
+[[stages]]
+stage_id = "extract_predictor"
+kind = "predict_dataset_extract"
+depends_on = ["collect_live"]
+sources = ["${stages.collect_live.outputs.combat_outcomes_paths}"]
+output_dir = "./data/predict/predictor-promotion-example"
+replace_existing = true
+split_seed = 7
+train_fraction = 0.8
+validation_fraction = 0.1
+test_fraction = 0.1
+split_group_by = "session_run"
+
+[[stages]]
+stage_id = "train_predictor"
+kind = "predict_train"
+depends_on = ["extract_predictor"]
+dataset_source = "${stages.extract_predictor.outputs.output_dir}"
+output_root = "./artifacts/predict"
+session_name = "predictor-promotion-example"
+config = { epochs = 250, learning_rate = 0.05, l2 = 0.0005, validation_fraction = 0.2, seed = 7 }
+
+[[stages]]
+stage_id = "rank_predictor"
+kind = "predict_report_ranking"
+depends_on = ["train_predictor"]
+model_path = "${stages.train_predictor.outputs.model_path}"
+dataset_source = "${stages.extract_predictor.outputs.output_dir}"
+output_root = "./artifacts/predict-reports"
+session_name = "predictor-promotion-example-ranking"
+split = "validation"
+group_by = ["character", "floor_band", "encounter_family"]
+top_k = 3
+min_group_size = 2
+thresholds = { outcome_pairwise_accuracy_min = 0.58, reward_pairwise_accuracy_min = 0.58, damage_pairwise_accuracy_min = 0.58, reward_ndcg_at_3_min = 0.62, damage_ndcg_at_3_min = 0.62 }
+
+[[stages]]
+stage_id = "register_predictor"
+kind = "registry_register"
+depends_on = ["rank_predictor"]
+registry_root = "./artifacts/registry"
+source = "${stages.rank_predictor.outputs.output_dir}"
+aliases = ["predictor_candidate"]
+tags = ["predictor", "dag-example"]
+
+[[stages]]
+stage_id = "promote_predictor"
+kind = "registry_promote"
+depends_on = ["register_predictor"]
+registry_root = "./artifacts/registry"
+alias_name = "best_predictor"
+experiment = "${stages.register_predictor.outputs.experiment_id}"
+reason = "dag promotion example"

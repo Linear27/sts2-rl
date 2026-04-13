@@ -1,0 +1,46 @@
+schema_version = 1
+dataset_name = "predictor-live"
+dataset_kind = "predictor_combat_outcomes"
+description = "Predictor dataset built from combat outcome exports."
+
+[[sources]]
+path = "artifacts/training"
+source_kind = "combat_outcomes"
+recursive = true
+
+[[sources]]
+path = "artifacts/eval"
+source_kind = "combat_outcomes"
+recursive = true
+
+[filters]
+session_kinds = []
+session_names = []
+instance_ids = []
+character_ids = []
+act_ids = ["THE_CITY", "THE_BEYOND"]
+boss_ids = []
+second_boss_ids = []
+outcomes = ["won", "lost"]
+decision_reasons = []
+planner_names = []
+planner_strategies = []
+route_reason_tags = []
+route_profiles = []
+min_floor = 1
+
+[split]
+train_fraction = 0.8
+validation_fraction = 0.1
+test_fraction = 0.1
+seed = 7
+group_by = "session_run"
+
+[output]
+export_csv = true
+include_top_level_records = true
+write_split_files = true
+
+[metadata]
+owner = "local"
+purpose = "predictor-training"

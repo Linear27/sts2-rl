@@ -1,0 +1,47 @@
+# Example configuration reference for `sts2-rl train offline-cql`.
+#
+# The current CLI is flag-driven. This file documents a reproducible offline CQL
+# session and the values we expect to mirror on the command line.
+
+[run]
+name = "offline-cql-live-v024"
+output_root = "artifacts/offline-cql"
+seed = 7
+
+[data]
+dataset = "data/offline/live-v024"
+include_action_space_names = ["combat_v1"]
+min_floor = 1
+max_floor = 45
+min_reward = -2.0
+max_reward = 3.0
+
+[train]
+epochs = 40
+batch_size = 32
+learning_rate = 0.001
+gamma = 0.97
+huber_delta = 1.0
+hidden_sizes = [64, 64]
+l2 = 0.0001
+conservative_alpha = 1.0
+conservative_temperature = 1.0
+target_sync_interval = 50
+validation_fraction = 0.15
+test_fraction = 0.15
+early_stopping_patience = 8
+
+[live_eval]
+enabled = true
+base_url = "http://127.0.0.1:8080"
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+poll_interval_seconds = 0.25
+max_idle_polls = 40
+request_timeout_seconds = 30.0
+
+[benchmark]
+enabled = true
+manifest = "configs/benchmarks/combat-suite.example.toml"
+suite_name = "offline-cql-benchmark"

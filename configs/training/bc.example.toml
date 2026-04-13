@@ -1,0 +1,82 @@
+# Example configuration reference for `sts2-rl train behavior-cloning`.
+#
+# The current CLI is flag-driven. This file documents a reproducible session
+# layout and the values we expect to mirror on the command line for common BC
+# runs such as heuristic-only, predictor-guided, or curated high-win datasets.
+
+[run]
+name = "bc-live-v024"
+output_root = "artifacts/behavior-cloning"
+seed = 7
+
+[data]
+dataset = "data/trajectory/live-v023"
+include_stages = ["combat", "map", "reward", "rest", "shop"]
+include_decision_sources = ["heuristic", "planner", "predictor_assist"]
+include_policy_packs = ["baseline", "planner", "planner_assist"]
+include_policy_names = []
+min_floor = 1
+max_floor = 45
+min_legal_actions = 2
+
+[train]
+epochs = 40
+learning_rate = 0.035
+l2 = 0.0001
+validation_fraction = 0.15
+test_fraction = 0.15
+top_k = [1, 3, 5]
+
+[weights.stage]
+combat = 1.0
+map = 1.1
+reward = 1.05
+rest = 1.0
+shop = 1.0
+
+[weights.decision_source]
+heuristic = 1.0
+planner = 1.15
+predictor_assist = 1.1
+
+[weights.policy_pack]
+baseline = 1.0
+planner = 1.15
+planner_assist = 1.1
+
+[weights.policy_name]
+
+[weights.run_outcome]
+won = 1.2
+lost = 0.9
+interrupted = 0.6
+
+[[weights.floor_band]]
+min_floor = 1
+max_floor = 16
+weight = 0.95
+
+[[weights.floor_band]]
+min_floor = 17
+max_floor = 34
+weight = 1.05
+
+[[weights.floor_band]]
+min_floor = 35
+max_floor = 99
+weight = 1.15
+
+[live_eval]
+enabled = true
+base_url = "http://127.0.0.1:8080"
+max_env_steps = 0
+max_runs = 1
+max_combats = 0
+poll_interval_seconds = 0.25
+max_idle_polls = 40
+request_timeout_seconds = 30.0
+
+[benchmark]
+enabled = true
+manifest = "configs/benchmarks/combat-suite.example.toml"
+suite_name = "behavior-cloning-benchmark"

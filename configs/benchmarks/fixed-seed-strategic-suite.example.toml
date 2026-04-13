@@ -1,0 +1,60 @@
+schema_version = 1
+suite_name = "fixed-seed-strategic"
+description = "Fixed-seed strategic benchmark suite for low-parallel local promotion."
+base_url = "http://127.0.0.1:8080"
+
+[stats]
+bootstrap_resamples = 500
+confidence_level = 0.95
+seed = 41
+
+[[cases]]
+case_id = "legacy-fixed-seed"
+mode = "eval"
+policy_profile = "baseline"
+repeats = 3
+prepare_target = "none"
+max_runs = 1
+
+[cases.game_run_contract]
+game_seed = "FIXED-SEED-001"
+character_id = "IRONCLAD"
+ascension = 0
+progress_profile = "debug-unlocked"
+strict = true
+
+[cases.scenario]
+planner_strategies = ["legacy"]
+boss_ids = ["THE_CHAMP"]
+
+[[cases]]
+case_id = "strategic-fixed-seed-promotion"
+mode = "compare"
+baseline_policy_profile = "baseline"
+candidate_policy_profile = "boss_pathing"
+repeats = 3
+prepare_target = "none"
+max_runs = 1
+
+[cases.game_run_contract]
+game_seed = "FIXED-SEED-001"
+character_id = "IRONCLAD"
+ascension = 0
+progress_profile = "debug-unlocked"
+benchmark_contract_id = "fixed-seed-ironclad-a0"
+strict = true
+
+[cases.scenario]
+boss_ids = ["THE_CHAMP"]
+planner_strategies = ["boss_pathing"]
+route_reason_tags = ["search_scaling", "stabilize_before_boss"]
+
+[cases.promotion]
+min_seed_set_coverage = 1.0
+min_route_decision_count = 2
+min_route_decision_overlap_rate = 0.5
+min_delta_total_reward = 0.0
+min_delta_combat_win_rate = 0.0
+min_delta_route_quality_score = 0.0
+min_delta_pre_boss_readiness = 0.0
+max_delta_route_risk_score = 0.0

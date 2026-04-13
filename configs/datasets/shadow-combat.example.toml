@@ -1,0 +1,25 @@
+schema_version = 1
+dataset_name = "shadow-combat-local"
+dataset_kind = "shadow_combat_encounters"
+description = "Encounter-start snapshot dataset for shadow-environment research."
+
+[[sources]]
+path = "data/trajectories"
+source_kind = "trajectory_log"
+recursive = true
+
+[filters]
+session_kinds = ["collect", "eval", "train"]
+min_floor = 1
+
+[split]
+train_fraction = 0.7
+validation_fraction = 0.15
+test_fraction = 0.15
+seed = 17
+group_by = "combat_id"
+
+[output]
+export_csv = true
+include_top_level_records = true
+write_split_files = true
